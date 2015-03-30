@@ -47,15 +47,35 @@ var app = {
 
         console.log('Received Event: ' + id);
         console.log('hello');
-        getfile();
+        //getfile();
         readfile('vehicles.txt');
+        readfile("mans.txt");
+
     }
 
 };
 
-
+var recalls =[];
 function getfile() {
-    check3("RecallsFile.csv");
+    var son = [];
+    //var mans =  window.localStorage.getItem("mans");
+    //alert(mans);
+    //vm.mans(mans);
+
+
+    //if (window.sessionStorage.getItem("mans")) {
+    //    //son = window.sessionStorage.getItem("recalls");//ko.utils.parseJson(outputstr);
+    //    //alert(JSON.stringify(son));
+    //    //vm.mans(window.sessionStorage.getItem("mans"));
+    //    //if (son)
+    //    alert(JSON.stringify(window.sessionStorage.getItem("mans")));
+    //    //ko.mapping.fromJSON(window.sessionStorage.getItem("mans"), vm.mans());
+        
+    //    //vm.mans(vm.mans())
+    //    //init(son);
+    //}
+    //else
+    //  check3("RecallsFile.csv");
 
 }
 var countfail = 0;
@@ -117,7 +137,7 @@ function gotfile(entry) {
 
     }
     else {
-       // alert('opening');
+        //alert('opening');
         var reader = new FileReader();
         reader.onloadend = function (evt) {
             //alert("read success");
@@ -170,28 +190,31 @@ function gotfile(entry) {
 
 }
 function init(bet) {
-    vm.isloading(true);
-    //var m = processData(evt.target.result);
-    //alert(bet.data);
+    try{
+        vm.isloading(true);
+        //var m = processData(evt.target.result);
+        //alert(bet);
 
     
-    if (countfail >= 2)
-        alert("Error Occured!");
-    //
-    try {
-        bet.data.sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
-        vm.recalls(bet.data);
-        vm.getmans(bet.data);
-        vm.isloading(false);
-        $('.help').addClass("hidden");
+        if (countfail >= 2)
+            alert("Error Occured!");
+        //
+        try {
+            bet.sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
+            //vm.recalls(bet);
+            //vm.getmans(bet);
+            ko.mapping.fromJS(window.sessionStorage.getItem("mans"), vm.mans());
+            vm.isloading(false);
+            $('.help').addClass("hidden");
 
-        //alert(JSON.stringify(vm.mans()));
-    } catch (e) { alert(e) }
-    //ko.mapping.fromJS(mans, vm.mans());
-    //alert(data.length);
-    //vm.recalls(data);
-    //alert(vm.mans().length);
-    vm.isloading(false);
+            //alert(JSON.stringify(vm.mans()));
+        } catch (e) { alert(e) }
+        //ko.mapping.fromJS(mans, vm.mans());
+        //alert(data.length);
+        //vm.recalls(data);
+        //alert(vm.mans().length);
+        vm.isloading(false);
+    } catch (e) { alert(e);}
 }
 function writefile(fileName, data) {
     //store = cordova.file.dataDirectory;
@@ -236,6 +259,7 @@ function writefile(fileName, data) {
            // alert(fileName);
            // alert(data);
             writer.onwriteend = function (evt) {
+
                // alert("contents of file now 'some sample text'");
                 //writer.truncate(11);
                 writer.onwriteend = function (evt) {
@@ -322,47 +346,105 @@ function processData(allText) {
 
 
 function readfile(fileName) {
-    try{
+    try {
         store = cordova.file.dataDirectory;
-    } catch (e) { alert(e);}
-    window.resolveLocalFileSystemURL(store + fileName, function (reader) { return openfile(reader, fileName); }, filenotfound);
+
+    } catch (e) { alert(e); }
+    window.resolveLocalFileSystemURL(store + fileName, function (reader) { return openfile(reader, fileName); }, function () { return filenotfound(fileName); });
 }
 function openfile(entry, fileName) {
     //alert('ead' + ".txt" + JSON.stringify(entry.File()));
     var file = entry.file(function (reader) { return readthis(reader, fileName); }, downloadAsset);
+
 }
-function filenotfound() {
-    //alert("file not found!");
+function filenotfound(fileName) {
+    //alert(fileName);
+    if (fileName == "reminders.txt") {
+        readfile("vehicles.txt");
+    }
+    if (fileName == "vehicles.txt") {
+        vm.novehicles(true);
+        //vm.isloading(false);
+    }
+    //alert("You don't have any vehicles!");
+
 }
-function readthis(entry,fileName) {
+function readthis(entry, fileName) {
 
     //alert('opening');
     var reader = new FileReader();
     reader.onloadend = function (evt) {
-        //alert("read success");
+        // alert("read success");
         try {
             var son = ko.utils.parseJson(evt.target.result);
             //ko.mapping.fromJS(son, vm.searchresult());
             //alert(evt.target.result);
-            var i ;
-            for (i = 0; i < son.length; i++)
-            {
+            var i;
+            for (i = 0; i < son.length; i++) {
                 if (!son[i]) {
 
                     son.splice(i, 1);
                     //writefile(fileName, son);
                 }
             }
-            ko.mapping.fromJS(son, vm.searchresult);
-            vm.isloading(false);
+            if (fileName == "mans.txt") {
+                son.sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
+                ko.mapping.fromJS(son, {}, vm.mans);
+                $('.help').addClass("hidden");
+            }
+            if (fileName == "reminders.txt") {
+                ko.mapping.fromJS(son, vm.reminders);
+                //vm.reminders(son);
+                //alert(JSON.stringify(vm.reminders()));
+                //return;
+                readfile("vehicles.txt");
 
-            //vm.searchresult(son);
-            //alert('afte reaad:'+vm.searchresult().length);
-            //alert(JSON.stringify(vm.searchresult()));
-            //alert(JSON.stringify(vm.searchresult()));
+            }
+            if (fileName == "vehicles.txt") {
+                ko.mapping.fromJS(son, vm.searchresult);
+                //vm.searchresult(son);
+                ///alert(JSON.stringify(vm.searchresult()));
+                //alert('afte reaad:'+vm.searchresult().length);
+                var m = ko.mapping.toJSON(vm.searchresult()[0]);
+                //alert(m);
+                // alert(vm.reminders().length);
+                var i = 0;
+                if (vm.searchresult().length > 0) {
+                    for (i; i < vm.searchresult().length; i++) {
+                        var array;
+                        // alert(JSON.stringify(vm.reminders()[0]));
+                        //array = ko.utils.arrayFilter(vm.reminders(), function (item) {
+                        //    //  alert(item.Reg() + vm.searchresult()[i].Reg);
+                        //    return item.Reg() == vm.searchresult()[i].Reg();
+                        //});
+                        ///alert('the rec:' + JSON.stringify(array));
+                        //alert(array.length);
+
+                        //array.sort(function (l, r) {
+                        //    return (Date.parse(l.date) == Date.parse(r.date) ? 0 : (Date.parse(l.date) > Date.parse(r.date) ? 1 : -1))
+                        //});
+                        //ko.mapping.fromJS(array, vm.currentreg().vehiclerecalls);
+                        if (!vm.searchresult()[i]) {
+                            vm.searchresult().splice(i, 1);
+                            continue
+                        }
+                        //alert(JSON.stringify(vm.searchresult()[i]));
+                        //vm.searchresult()[i].vehiclereminders(array);
+                        //alert('len' + vm.currentreg().vehiclerecalls().length);
+                        //var l = JSON.stringify(vm.searchresult()[i].vehiclerecalls());
+                        //alert('>>>' + l);
+                    }
+                    $('.help').addClass("hidden");
+                    vm.isloading(false);
+                    vm.novehicles(false);
+                }
+            }
+            else {
+                vm.novehicles(true); vm.isloading(false);
+            }
             //alert(son);
-            $('.help').addClass("hidden");
-        } catch (e) { alert(e) }
+
+        } catch (e) { alert('el>>' + e) }
     };
     reader.readAsText(entry);
 

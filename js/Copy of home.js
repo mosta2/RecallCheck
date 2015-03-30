@@ -53,8 +53,6 @@ var app = {
 };
 
 var mans = window.sessionStorage.getItem("mans");
-var recalls = window.sessionStorage.getItem("recalls");
-var newdata = false;
 
 function getfile(filename) {
    var ch = window.sessionStorage.getItem("checked");
@@ -83,27 +81,26 @@ function appStart(entry) {
 
 }
 function downloadAsset(asset,filename) {
-    //alert(JSON.stringify(filename)); 
-    //alert("http://www.leadyourweb.com/" + filename);
+    alert(JSON.stringify(filename)); 
+    alert("http://www.leadyourweb.com/" + filename);
     var fileTransfer = new FileTransfer();
-    
+
     var uri = encodeURI("http://www.leadyourweb.com/" + filename);
     file_path = cordova.file.dataDirectory;
     //alert("About to start transfer");
     fileTransfer.download(uri, file_path + filename,
     	function (entry) {
-    	    //alert("Success!" + file_path + filename);
+    	    alert("Success!" + file_path + filename);
     	    //checkfileexist(file_path + 'test.txt');
-    	    newdata = true;
     	    appStart(entry);
     	},
     	function (err) {
     	    console.log("Error");
-    	    //alert(JSON.stringify(err));
+    	    alert(JSON.stringify(err));
     	});
 }
 function gotfile(entry) {
-    //alert(JSON.stringify(entry));
+    alert(JSON.stringify(entry));
     var d = new Date();
     var filedate = entry.lastModifiedDate;
     var now = d.getTime();
@@ -121,87 +118,45 @@ function gotfile(entry) {
     window.sessionStorage.setItem("checked", "1");
     window.sessionStorage.setItem("lastchecked", filedate);
 
-    if (days > 7 && entry.name == "recallsfilemap.txt") {
+    if (days > 7) {
         //alert('refres');
         downloadAsset();
-        vm.progress("Cheking New Recalls");
+
     }
     else {
 
         //vm.recalls(bet.data);
         //vm.getmans(bet.data);
-        //vm.isloading(false);
+        vm.isloading(false);
         $('.help').addClass("hidden");
-        //alert('opening');
+        alert('opening');
         var reader = new FileReader();
         reader.onloadend = function (evt) {
             //alert("read success");
             try {
                 //data = $.csv2Array(evt.target.result);
                 // Parse CSV string
-                //alert(evt.target.result);
-                if (entry.name == "recallsfilemap.txt" && newdata) {
-
+                alert(evt.target.result);
+                if (entry.name == "recallsfilemap.txt")
+                {
                     var lines = this.result.split('\r\n');
-                    vm.totalfiles(lines.length);
                     for (var line = 0; line < lines.length; line++) {
-                        if (lines[line].length > 0) {
-                            getfile(lines[line]);
-                        }
-                        else { vm.totalfiles(vm.totalfiles() - 1); }
-
-
+                        getfile(lines[line]);
                     }
                 }
-                else
-                    vm.isloading(false);
-
-                if (entry.name.indexOf(".csv") > -1)
-                {
-var bet = Papa.parse(evt.target.result.toString(), { header: true });
+                var bet = Papa.parse(evt.target.result.toString(), { header: true });
                 //alert(JSON.stringify(bet));
-                //setmans(bet.data);
-                
-                    //fillrecalls(bet.data);
-//ko.mapping.fromJS(bet.data, vm.mans());
-vm.getmans(bet.data);
-                    //window.localStorage.setItem("mans", ko.toJSON(vm.mans()));
+                setmans(bet.data);
+                vm.isloading(true);
+                //var m = processData(evt.target.result);
+                //alert(bet.data);
 
-vm.filesread(vm.filesread() + 1);
-                    
-
-if (vm.filesread() == vm.totalfiles()) {
-    //alert(ko.toJSON(vm.mans(), null, 2));
-    // vm.status(vm.status() + "<br>Read files " + vm.filesread() + " of " + vm.totalfiles());
-    //alert('star writing');
-
-    //vm.mans().sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
-    writefile("mans.txt", ko.toJSON(vm.mans(), null, 2));
-
-    vm.isloading(false);
-
-
-}
-else {
-    vm.isloading(true);
-    
-    vm.progress((((vm.filesread() / vm.totalfiles()) * 100)).toFixed(0) + " %");
-
-}
-//alert(vm.filesread());
- if (!bet.data & countfail < 2) {
+                if (!bet.data & countfail < 2) {
                     countfail += 1;
                     downloadAsset();
                 }
                 if (countfail >= 2)
                     alert("Error Occured!");
-                }
-                
-                //vm.isloading(true);
-                //var m = processData(evt.target.result);
-                //alert(bet.data);
-
-               
                 //
                 try{
 
@@ -211,6 +166,7 @@ else {
                 //alert(data.length);
                 //vm.recalls(data);
                 //alert(vm.mans().length);
+                vm.isloading(false);
                 //var csvAsArray = evt.target.result.csvToArray();
                 // alert(JSON.stringify(data));
             } catch (e) { alert(e) }
@@ -254,7 +210,7 @@ function writefile(fileName, data) {
         store = cordova.file.dataDirectory;
         //alert(fileName);
         //alert(data);
-        fileSystem.root.getFile(store + fileName, { create: true, exclusive: false }, function (gotfile) { return gotFileEntry(gotfile, fileName, data); }, fail);
+        fileSystem.root.getFile("/RecallCheck/" + fileName, { create: true, exclusive: false }, function (gotfile) { return gotFileEntry(gotfile, fileName, data); }, fail);
         function gotFileEntry(fileEntry, fileName, data) {
 
             fileEntry.createWriter(function (writer) { return gotFileWriter(writer, fileName, data); }, fail);
@@ -369,7 +325,7 @@ function readthis(entry,fileName) {
         try {
             var son = ko.utils.parseJson(evt.target.result);
             //ko.mapping.fromJS(son, vm.searchresult());
-            //alert(fileName + ">"+evt.target.result);
+            alert(fileName + ">"+evt.target.result);
             var i ;
             for (i = 0; i < son.length; i++)
             {
@@ -380,7 +336,7 @@ function readthis(entry,fileName) {
                 }
             }
             ko.mapping.fromJS(son, vm.searchresult);
-            //vm.isloading(false);
+            vm.isloading(false);
 
             //vm.searchresult(son);
             //alert('afte reaad:'+vm.searchresult().length);
@@ -407,7 +363,7 @@ function setmans(array) {
         if (window.sessionStorage.getItem("mans")) {
             son = window.sessionStorage.getItem("mans");//ko.utils.parseJson(outputstr);
         }
-        //alert("ess" +JSON.stringify( son));
+        alert("ess" +JSON.stringify( son));
         //ko.mapping.fromJS(son, vm.searchresult());
         var i;
         for (i = 0; i < son.length; i++) {
@@ -476,6 +432,3 @@ function getmodels(make, recalls) {
         //alert(JSON.stringify(output));
     } catch (e) { alert('103' + e); }
 }
-
-
-

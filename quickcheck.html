@@ -36,18 +36,15 @@
             
             <div data-bind="visible: isloading || mans().length ==0" >Loading..</div>
                <div data-bind="visible: mans().length > 0">
-            <select data-bind="options: mans(), optionsText: 'Make', visible: mans().length > 0, value: selectedmake, optionsCaption: 'Select Manufacturer'"></select>
+            <select data-bind="options: mans(), optionsText: 'Make', visible: mans().length > 0, value: selectedmake, optionsCaption: 'Select Manufacturer', event: { change: combochange }"></select>
              </div>
-            <div  data-bind="visible: (selectedmake() && selectedmake().Models().length > 0)"><select data-bind="    options: (selectedmake() && selectedmake().Models()) ? selectedmake().Models() : [], visible: (selectedmake() && selectedmake().Models().length > 0), value: selectedmodel, optionsCaption: 'Select Model'"></select>
+            <div  data-bind="visible: (selectedmake() && selectedmake().Models().length > 0)"><select data-bind="    options: (selectedmake() && selectedmake().Models()) ? selectedmake().Models() : [], optionsText: 'Model', visible: (selectedmake() && selectedmake().Models().length > 0), value: selectedmodel, optionsCaption: 'Select Model', event: { change: combochange }"></select>
                 </div>
-            <div  data-bind="visible: selectedmodel()">
-            <button  data-bind="click: $root.performsearch()">Search</button>
-                </div>
-            <div>
-
-                    <div data-role="collapsible-set" data-theme="b"  data-bind="foreach: searchresult" data-content-theme="d" >
+            <div   data-bind="visible: selectedmodel()">
+                  <!-- ko if:  selectedmodel()  -->  
+                    <div data-role="collapsible-set" data-theme="b"  data-bind="foreach: selectedmodel().recalls()" data-content-theme="d" >
                 <div   class="collapsible" >
-                    <h4  ><span  style="font-size:small;" data-bind="text: Concern +'    #'+ RecallsNumber +'   '+ LaunchDate"></span></h4>
+                    <h4  ><span  style="font-size:small;" data-bind="text: Concern() +'    #'+ RecallsNumber() +'   '+ LaunchDate()"></span></h4>
                     <p >
                          <span data-bind="visible: VINStart.length > 0 ,text: 'VIN Start: ' + VINStart + '   VIN End: ' + VINEnd "><br />
                          </span>
@@ -58,6 +55,8 @@
                        
                 </div>
                         </div>
+
+                <!-- /ko --> 
                 </div>
 
         </div>
@@ -102,40 +101,31 @@
                 self.BuildEnd = ko.observable();
 
             }
+
             var make = function () {
                 self = this;
                 self.Make = ko.observable('ggg');
                 self.Models = ko.observableArray([]);
 
-                self.getmodels = function getmodels() {
-                    try {
+                self.getmodels = function (model) {
+                    return ko.utils.arrayFilter(self.Models(), function (event) {
+                        return (event.Model() == model);
+                    });
+                };
 
-                        var flags = [], output = [], l = vm.recalls().length, i;
-                        for (i = 0; i < l; i++) {
+            }
 
-                            if (vm.recalls()[i].Make == self.Make()) {
-                                //alert('getting models for ' + self.Make() + '' + vm.recalls()[i].Model + '<<' + vm.recalls()[i].Model);
-                                var found = false;
-                                for (var j = 0; j < output.length; j++) {
-                                    if (output[j] === vm.recalls()[i].Model) {
-                                        found = true;
-                                    }
-                                }
-                                if (!found) output.push(vm.recalls()[i].Model);
+            var Model = function () {
+                self = this;
+                self.Model = ko.observable('ggg');
+                self.recalls = ko.observableArray([]);
 
-                                //alert(JSON.stringify(output));
-                                //output.push('hello');
+                self.getrecalls = function (concern) {
+                    return ko.utils.arrayFilter(self.recalls(), function (event) {
+                        return (event.recalls() == concern);
+                    });
+                };
 
-                            }
-                        }
-                        //ko.mapping.fromJS(output,this.mans());
-                        //alert(output + '<<');
-                        output.sort();
-                        self.Models(output);
-                        // alert(this.mans().length);
-                        //alert(JSON.stringify(output));
-                    } catch (e) { alert('103' + e); }
-                }
             }
 
             var viewModel = function () {
@@ -146,13 +136,17 @@
                     write: function (newValue) { this.active(parseInt(newValue, 10)); },
                     owner: this
                 });
+                self.combochange = function () {
+                    $('.collapsible').collapsible();
+                }
+                self.show = ko.observable(false);
+                self.mans = ko.mapping.fromJS([]);;
                 self.SearchQuery = ko.observable('ggg');
                 self.recalls = ko.observableArray([]);
                 self.isloading = ko.observable(false);
-                self.mans = ko.observableArray([]);
                 self.selectedmake = ko.observable(make);
                 self.selectedmodel = ko.observable();
-                self.searchresult = ko.observableArray([Recall]);
+                self.searchresult = ko.observableArray([]);
 
                 self.getmans = function getmans(array) {
                     try {
@@ -176,19 +170,25 @@
                 };
                 self.performsearch = function performsearch() {
                     var i;
-                    if (self.selectedmodel())
-                        i = self.selectedmodel();
-                    //alert(i);
-                    var array;
-                    array = ko.utils.arrayFilter(self.recalls(), function (item) {
-                        return item.Model == self.selectedmodel();
-                    });
-                    //alert(JSON.stringify(array));
+                    self.show(true);
+                    //if (self.selectedmodel()) {
+                    //    i = self.selectedmodel();
+                        
+                    //    self.searchresult(self.selectedmodel().recalls);
 
-                    array.sort(function (l, r) {
-                        return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
-                    });
-                    self.searchresult(array);
+                    //}
+                    
+                    //var array;
+                    //array = ko.utils.arrayFilter(self.recalls(), function (item) {
+                    //    return item.Model == self.selectedmodel();
+                    //});
+                    ////alert(JSON.stringify(array));
+
+                    //array.sort(function (l, r) {
+                    //    return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
+                    //});
+                    ////self.searchresult(array);
+                    ////searchresult()
 
                     $('.collapsible').collapsible();
                 }

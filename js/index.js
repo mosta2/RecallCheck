@@ -47,15 +47,15 @@ var app = {
 
         console.log('Received Event: ' + id);
         console.log('hello');
-        getfile();
-        readfile('vehicles.txt');
+        //getfile();
+        readfile('mans.txt');
     }
 
 };
 
 
 function getfile() {
-    check3("RecallsFile.csv");
+   // check3("RecallsFile.csv");
 
 }
 var countfail = 0;
@@ -294,7 +294,8 @@ function processData(allText) {
 function readfile(fileName) {
     try{
         store = cordova.file.dataDirectory;
-    } catch (e) { alert(e);}
+    } catch (e) { alert(e); }
+
     window.resolveLocalFileSystemURL(store + fileName, function (reader) { return openfile(reader, fileName); }, filenotfound);
 }
 function openfile(entry, fileName) {
@@ -302,7 +303,7 @@ function openfile(entry, fileName) {
     var file = entry.file(function (reader) { return readthis(reader, fileName); }, downloadAsset);
 }
 function filenotfound() {
-    //alert("file not found!");
+    alert("file not found!");
 }
 function readthis(entry,fileName) {
 
@@ -314,6 +315,7 @@ function readthis(entry,fileName) {
             var son = ko.utils.parseJson(evt.target.result);
             //ko.mapping.fromJS(son, vm.searchresult());
             //alert(evt.target.result);
+
             var i ;
             for (i = 0; i < son.length; i++)
             {
@@ -323,7 +325,10 @@ function readthis(entry,fileName) {
                     //writefile(fileName, son);
                 }
             }
-            ko.mapping.fromJS(son, vm.searchresult);
+            son.sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
+            ko.mapping.fromJS(son, {}, vm.mans);
+            $('.help').addClass("hidden");
+            //ko.mapping.fromJS(son, vm.mans);
             vm.isloading(false);
 
             //vm.searchresult(son);

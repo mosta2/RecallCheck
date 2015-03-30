@@ -47,7 +47,9 @@ var app = {
 
         console.log('Received Event: ' + id);
         console.log('hello');
-        getfile();
+        //getfile();
+        readfile('vehicles.txt');
+
     }
 
 };
@@ -299,6 +301,8 @@ function openfile(entry, fileName) {
 }
 function filenotfound() {
     //alert("You don't have any vehicles!");
+    vm.novehicles(true);
+    vm.isloading(false);
 }
 function readthis(entry, fileName) {
 
@@ -326,30 +330,34 @@ function readthis(entry, fileName) {
             var i = 0;
             if (vm.searchresult().length > 0) {
                 for (i; i < vm.searchresult().length; i++) {
-                    var array;
-                    array = ko.utils.arrayFilter(vm.recalls(), function (item) {
-                        return item.Model == vm.searchresult()[i].Model();
-                    });
-                    //alert('the rec:' + JSON.stringify(array));
+                    //var array;
+                    //array = ko.utils.arrayFilter(vm.recalls(), function (item) {
+                    //    return item.Model == vm.searchresult()[i].Model();
+                    //});
+                    ////alert('the rec:' + JSON.stringify(array));
 
-                    array.sort(function (l, r) {
-                        return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
-                    });
+                    //array.sort(function (l, r) {
+                    //    return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
+                    //});
                     //ko.mapping.fromJS(array, vm.currentreg().vehiclerecalls);
                     if (!vm.searchresult()[i]) {
                         vm.searchresult().splice(i, 1);
                         continue
                     }
                     //alert(JSON.stringify(vm.searchresult()[i]));
-                    vm.searchresult()[i].vehiclerecalls(array);
+                    //vm.searchresult()[i].vehiclerecalls(array);
                     //alert('len' + vm.currentreg().vehiclerecalls().length);
                     //var l = JSON.stringify(vm.searchresult()[i].vehiclerecalls());
                     //alert('>>>' + l);
+                    //vm.currentreg(vm.searchresult()[0]);
+                    //ko.mapping.fromJS(vm.searchresult()[0], {}, vm.currentreg());
+                    vm.setcurrentreg(0);
                 }
+                //ko.mapping.fromJS(vm.searchresult()[0], {}, vm.currentreg);
 
-                vm.currentreg(vm.searchresult()[0]);
+                //vm.currentreg(vm.searchresult()[0]);
                 //alert(ko.mapping.toJSON(vm.currentreg()));
-                vm.idxcurrentreg(0);
+                //vm.idxcurrentreg(0);
                 $('.collapsible').collapsible();
                 $('.help').addClass("hidden");
                 vm.isloading(false);

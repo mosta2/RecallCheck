@@ -300,7 +300,7 @@ function openfile(entry, fileName) {
     
 }
 function filenotfound(fileName) {
-    alert(fileName);
+   // alert(fileName);
     if (fileName == "reminders.txt")
     {
         readfile("vehicles.txt");

@@ -70,7 +70,7 @@
                  </h4>
 
             </td>
-            <td data-bind="text: Model"></td>
+            <td data-bind="text: Model.Model"></td>
             <td data-bind="text: Make"></td>
             
             
@@ -81,11 +81,11 @@
             <select data-bind="options: mans(), optionsText: 'Make', visible: mans().length > 0, value: selectedmake, optionsCaption: 'Select Manufacturer'"></select>
              </div>
             <div  data-bind="visible: (selectedmake() && selectedmake().Models().length > 0)">
-                <select data-bind="    options: (selectedmake() && selectedmake().Models()) ? selectedmake().Models() : [], visible: (selectedmake() && selectedmake().Models().length > 0), value: selectedmodel, optionsCaption: 'Select Model'"></select>
+                <select data-bind="    options: (selectedmake() && selectedmake().Models()) ? selectedmake().Models() : [],  optionsText: 'Model', visible: (selectedmake() && selectedmake().Models().length > 0), value: selectedmodel, optionsCaption: 'Select Model'"></select>
                 </div>
             <div  data-bind="visible: selectedmodel()">
                 <div class="txtveh">
-            <input type="text"  style="background-image:url('img/plate.png'); background-repeat:no-repeat; padding-left:25px; font-size:large; font-weight:bold; color:black; background-color:yellow; min-height:40px; " data-bind="value: newvehicle" >
+            <input type="text"  style="background-image:url('img/plate.png'); background-repeat:no-repeat; padding-left:25px; font-size:large; font-weight:bold; color:black; background-color:#fbe712; min-height:40px; " data-bind="value: newvehicle" >
                     </div>
                 <button data-bind="click: $root.performsearch()" value="add">Add Vehicle</button>
                 </div>
@@ -96,6 +96,9 @@
                 </div>
 
         </div>
+                                   
+
+                                    
 
         <script type="text/javascript">
 
@@ -145,40 +148,31 @@
                 self.BuildEnd = ko.observable();
 
             }
+           
             var make = function () {
                 self = this;
                 self.Make = ko.observable('ggg');
                 self.Models = ko.observableArray([]);
 
-                self.getmodels = function getmodels() {
-                    try {
+                self.getmodels = function (model) {
+                    return ko.utils.arrayFilter(self.Models(), function (event) {
+                        return (event.Model() == model);
+                    });
+                };
 
-                        var flags = [], output = [], l = vm.recalls().length, i;
-                        for (i = 0; i < l; i++) {
+            }
 
-                            if (vm.recalls()[i].Make == self.Make()) {
-                                //alert('getting models for ' + self.Make() + '' + vm.recalls()[i].Model + '<<' + vm.recalls()[i].Model);
-                                var found = false;
-                                for (var j = 0; j < output.length; j++) {
-                                    if (output[j] === vm.recalls()[i].Model) {
-                                        found = true;
-                                    }
-                                }
-                                if (!found) output.push(vm.recalls()[i].Model);
+            var Model = function () {
+                self = this;
+                self.Model = ko.observable('ggg');
+                self.recalls = ko.observableArray([]);
 
-                                //alert(JSON.stringify(output));
-                                //output.push('hello');
+                self.getrecalls = function (concern) {
+                    return ko.utils.arrayFilter(self.recalls(), function (event) {
+                        return (event.recalls() == concern);
+                    });
+                };
 
-                            }
-                        }
-                        //ko.mapping.fromJS(output,this.mans());
-                        //alert(output + '<<');
-                        output.sort();
-                        self.Models(output);
-                        // alert(this.mans().length);
-                        //alert(JSON.stringify(output));
-                    } catch (e) { alert('103' + e); }
-                }
             }
 
             var Vehicle = function Vehicle() {
@@ -188,7 +182,7 @@
                 self.Reg = ko.observable();
                 self.order = ko.observable();
                 self.showdel = ko.observable(false);
-                self.vehiclerecalls = ko.observableArray([Recall]);
+                self.vehiclerecalls = ko.observableArray([]);
                 self.vehiclereminders = ko.observableArray();
 
 
@@ -196,6 +190,8 @@
             var viewModel = function () {
                 var self = this;
                 this.active = ko.observable(0);
+                self.novehicles = ko.observable(true);
+                self.currentreg = ko.observable(Vehicle);
                 this.selected = ko.computed({
                     read: function () { return this.active().toString(); },
                     write: function (newValue) { this.active(parseInt(newValue, 10)); },
@@ -214,31 +210,7 @@
                         }
                     }
                 };
-                //self.deletevehicle = function () {
-                //    return function (reg) {
-                //        self.searchresult.remove(reg);
-                //       writefile("vehicles.txt", ko.toJSON(self.searchresult(), null, 2));
-                //    }
-
-                //}
-                //self.deletevehicle = function () {
-                //    return function (event) {
-                //        var i;
-                //        var btn = $(event).parent();
-                //        alert("erge" + btn);
-                //        var m = btn.attr("veh");
-                //        alert(m);
-                //        for (i = 0; i < self.searchresult().length; i++) {
-                //            if (self.searchresult()[i].Reg == reg)
-                //            {
-                //                self.searchresult().splice(i, 1);
-                //            }
-                //        }
-                //        self.searchresult.remove(reg);
-                //        writefile("vehicles.txt", ko.toJSON(self.searchresult(), null, 2));
-                //    }
-
-                //}
+ 
                 self.getveh = function (reg) {
                     return ko.utils.arrayFilter(self.searchresult(), function (event) {
                         return (event.Reg == reg);
@@ -247,7 +219,7 @@
                 self.newvehicle = ko.observable("");
                 self.recalls = ko.observableArray([]);
                 self.isloading = ko.observable(false);
-                self.mans = ko.observableArray([]);
+                self.mans = ko.mapping.fromJS([]);;
                 self.selectedmake = ko.observable(make);
                 self.selectedmodel = ko.observable();
                 self.searchresult = ko.mapping.fromJS([]);
@@ -264,13 +236,15 @@
                             mymake.Make(array[i].Make);
                             mymake.getmodels(array[i].Make);
                             //mymake.Models(models);
+
                             if (array[i].Make && array[i].Make.toString().trim().length > 0)
                                 output.push(mymake);
                             // alert()
                         }
                         //alert(output);
                         //ko.mapping.fromJS(output,this.mans());
-                        this.mans(output);
+                        
+                        
                         // alert(this.mans().length);
                         //alert(JSON.stringify(output));
                     } catch (e) { alert('145' + e); }
@@ -303,6 +277,9 @@
                             var veh = new Vehicle();
                             veh.Make(self.selectedmake().Make());
                             veh.Model(self.selectedmodel());
+                            veh.Model.Model =self.selectedmodel().Model();
+                            //veh.vehiclerecalls();
+                            
                             veh.Reg(self.newvehicle());
                             var highest;
                             //alert(JSON.stringify(vm.searchresult()));
@@ -318,8 +295,9 @@
                             //alert('added' + JSON.stringify(veh) + veh.Make());
                             //var array = self.searchresult();
                             //array.push(veh);
-                            self.searchresult.push(veh);
+                            self.searchresult().push(veh);
 
+                            self.searchresult(self.searchresult());
                             //vm.searchresult(self.searchresult());
                             //alert('aftee' + JSON.stringify(self.searchresult()));
                             //ko.utils.addOrRemoveItem(self.searchresult(),veh,true);

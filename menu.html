@@ -26,104 +26,78 @@
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 >
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /-->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
         
         <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <link rel="stylesheet" href="css/global.css">
         
-        <title>Recalls</title>
+        <title>Recall Check</title>
     </head>
     <body>
-        
+
                 <script type="text/javascript" src="cordova.js"></script>
-                <script type="text/javascript" src="js/FileTransfer.js"></script>
+                <script type="text/javascript" src="js/global.js"></script>
+
+        <script type="text/javascript" src="js/FileTransfer.js"></script>
         <script type="text/javascript" src="js/FileTransferError.js"></script>
-        <script type="text/javascript" src="js/recalls.js"></script>
+        <script type="text/javascript" src="js/home.js"></script>
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/jquery.mobile-1.4.5.js"></script>
         <script type="text/javascript" src="js/knockout.js"></script>
         <script type="text/javascript" src="js/knockout.mapping.js"></script>
                 <script type="text/javascript" src="js/papaparse.min.js"></script>
-        <div class="app">
-            <div class="center">        
-<a href="index.html" data-ajax="false">   <a href="index.html"  data-ajax="false"> <img width="30px" src="img/home.png" /></a>      
-                   <a href="index.html" data-ajax="false"> <img  style="min-width:242px;min-height:107px" src="img/logo.png" /></a>
-                  <a href="recalls.html" data-ajax="false"> <img width="30px" src="img/warning.png" /></a> <div  class="help"> 
-	<h5>Recalls: Navigate to view your vehicle Recalls</h5> 
-</div> 
-            <div data-bind="visible: isloading" >Loading..</div></div> 
-            
-             
+        <div class="app" > 
+              <div data-bind="visible: isloading"  id="divOverlay" ><span data-bind="text:status"></span></div>
+              <div class="center">           <a href="index.html" data-ajax="false"> <img  style="min-width:242px;min-height:107px" src="img/logo.png" /></a><div  class="help"> 
+</div></div> 
             <div id="deviceready" class="blink hidden">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received hidden"></p>
                 
             </div>
-            
-  <!-- ko if:  vm.currentreg()  -->  
-           
-<div data-role="header">
-	<a href="index.html" data-bind="visible: (idxcurrentreg() > 0), click: function (index) { setcurrentreg(idxcurrentreg() - 1,index) }" data-icon="arrow-l">&nbsp;</a>
-	<h1 data-bind="text: currentreg().Reg"></h1>
-	<a href="index.html"  data-bind="visible: vm.searchresult().length-1 > idxcurrentreg(), click: function (index) { setcurrentreg(idxcurrentreg() + 1,index) }" data-icon="arrow-r">&nbsp;</a>
-</div>
-           
-             <!-- ko if:  vm.currentreg().Model && vm.currentreg().Model.recalls().length >0 -->  
-                      <div data-role="collapsible-set" data-theme="b"  data-bind="foreach: vm.currentreg().Model.recalls" data-content-theme="d" >
-                <div   class="collapsible" >
-                    <h4  ><span  style="font-size:small;" data-bind="text: Concern() +'    #'+ RecallsNumber() +'   '+ LaunchDate()"></span></h4>
-                    <p >
-                         <span data-bind="visible: VINStart.length > 0 ,text: 'VIN Start: ' + VINStart() + '   VIN End: ' + VINEnd() "><br />
-                         </span>
-                        <span data-bind="visible: VINStart.length > 0"><br /></span>
-                        <span data-bind="text: Defect "></span><br /><br />
-                        <span data-bind="visible: Remedy.length > 0 ,text: 'Remedy: ' + Remedy"></span>
-                    </p>
-                       
-                </div>
-                        </div>
-                         <!-- /ko -->
-             <!-- /ko -->
-        <!-- ko if: vm.currentreg() &&  vm.currentreg().Model &&  vm.currentreg().Model.recalls().length ==0 -->  
-                       <div>
-                No Recalls for this vehicle</div>  
           
-              
-             <!-- /ko -->  
-           
-                       <div data-bind="visible: novehicles() && !isloading()">
-                Duh! We need a vehicle,  <a href="vehicles.html" data-ajax="false">Click here to add your Vehicles</a></div>  
-          
-              
-        </div>
 
+                 <div class="center"><a href="vehicles.html" data-ajax="false" ><img src="img/iconvehicles.jpg" /></a></div>
+            <div class="center"><a href="quickcheck.html" data-ajax="false" ><img src="img/iconquickcheck.jpg" /></a></div>
+            <div class="center"><a href="recalls.html" data-ajax="false" ><img src="img/iconrecalls.jpg" /></a></div>            
+            <div class="center"><a href="reminders.html" data-ajax="false" ><img src="img/iconreminders.jpg" /></a></div>
+
+                        <div class="center"><a href="aboutus.html" data-ajax="false" ><img src="img/iconaboutus.jpg" /></a></div> 
+         
+            <div>
+                
+                
+                </div>
+
+        </div>
 
         <script type="text/javascript">
 
             var data;
-             
+
 
             $(document).on('pageinit', function () {
-                try{
+                try {
                     setup();
                     app.initialize();
-                    $(function () {
-                        // Bind the swipeHandler callback function to the swipe event on div.box
-                        $("#divOverlay").on("swipe", swipeHandler);
-                        // Callback function references the event target and adds the 'swipe' class to it
-                        function swipeHandler(event) {
-                            //alert('swiio');
-                            var veh = $("#divOverlay").attr("veh");
-                            //alert(veh);
-                            vm.swiperow(veh);
-                            //alert(value.showdel);
-                            $("#divOverlay").toggle(false);
+                } catch (w) { alert(w); }
+                $(function () {
+                    // Bind the swipeHandler callback function to the swipe event on div.box
+                    $("#divOverlay").on("swipe", swipeHandler);
+                    // Callback function references the event target and adds the 'swipe' class to it
+                    function swipeHandler(event) {
+                        //alert('swiio');
+                        var veh = $("#divOverlay").attr("veh");
+                        //alert(veh);
+                        vm.swiperow(veh);
+                        //alert(value.showdel);
+                        $("#divOverlay").toggle(false);
 
-                        }
-                    });
-                    //vm.loaddb();
-                } catch (e) { alert(e); }
+                    }
+                });
+                //vm.loaddb();
             });
-            
+
             var Recall = function Recall() {
                 self = this;
                 self.LaunchDate = ko.observable();
@@ -184,47 +158,70 @@
                 self.Reg = ko.observable();
                 self.order = ko.observable();
                 self.showdel = ko.observable(false);
-                self.vehiclerecalls = ko.observableArray([]);
-       
+                self.vehiclerecalls = ko.observableArray([Recall]);
+
+
             }
             var viewModel = function () {
                 var self = this;
                 this.active = ko.observable(0);
+                self.status = ko.observable('Loading .. please wait!');
                 this.selected = ko.computed({
                     read: function () { return this.active().toString(); },
                     write: function (newValue) { this.active(parseInt(newValue, 10)); },
                     owner: this
                 });
-                self.novehicles = ko.observable(true);
-                self.currentreg = ko.observable(); 
-                self.idxcurrentreg = ko.observable(0);
+
                 self.swiperow = function (reg) {
                     //alert(reg);
-                        var i;
-                        for (i = 0; i < self.searchresult().length; i++)
-                        {
-                            if (self.searchresult()[i].Reg == reg)
-                            {
-                                if (self.searchresult()[i].showdel == false) {
-                                    self.searchresult()[i].showdel = true;
-                                    vm.searchresult(self.searchresult());
-                                } else { self.searchresult()[i].showdel = false; }
-                            }
+                    var i;
+                    for (i = 0; i < self.searchresult().length; i++) {
+                        if (self.searchresult()[i].Reg == reg) {
+                            if (self.searchresult()[i].showdel == false) {
+                                self.searchresult()[i].showdel = true;
+                                vm.searchresult(self.searchresult());
+                            } else { self.searchresult()[i].showdel = false; }
                         }
+                    }
                 };
-              self.getveh = function (reg) {
+                //self.deletevehicle = function () {
+                //    return function (reg) {
+                //        self.searchresult.remove(reg);
+                //       writefile("vehicles.txt", ko.toJSON(self.searchresult(), null, 2));
+                //    }
+
+                //}
+                //self.deletevehicle = function () {
+                //    return function (event) {
+                //        var i;
+                //        var btn = $(event).parent();
+                //        alert("erge" + btn);
+                //        var m = btn.attr("veh");
+                //        alert(m);
+                //        for (i = 0; i < self.searchresult().length; i++) {
+                //            if (self.searchresult()[i].Reg == reg)
+                //            {
+                //                self.searchresult().splice(i, 1);
+                //            }
+                //        }
+                //        self.searchresult.remove(reg);
+                //        writefile("vehicles.txt", ko.toJSON(self.searchresult(), null, 2));
+                //    }
+
+                //}
+                self.getveh = function (reg) {
                     return ko.utils.arrayFilter(self.searchresult(), function (event) {
                         return (event.Reg == reg);
                     });
                 };
                 self.newvehicle = ko.observable("");
-                self.recalls = ko.observableArray([Recall]);
+                self.recalls = ko.observableArray([]);
                 self.isloading = ko.observable(false);
                 self.mans = ko.observableArray([]);
                 self.selectedmake = ko.observable(make);
                 self.selectedmodel = ko.observable();
-                self.searchresult = ko.mapping.fromJS([]);
-                 
+                self.searchresult = ko.mapping.fromJS([Vehicle]);
+
                 self.getmans = function getmans(array) {
                     try {
                         //alert(array.length);
@@ -250,27 +247,60 @@
                 };
                 self.performsearch = function performsearch() {
                     return function () {
+                        //alert('searchres:' + vm.searchresult().length);
+                        var m = JSON.stringify(self.searchresult());
+                        //alert(m);
+                        var i;
+                        if (self.newvehicle().length > 0) {
+                            i = self.selectedmodel();
+
+                        }
+                        else
+                            return;
+                        //alert(i);
+                        var array;
+                        //array = ko.utils.arrayFilter(self.recalls(), function (item) {
+                        //    return item.Model == self.selectedmodel();
+                        //});
+                        //alert(JSON.stringify(array));
+
+                        //array.sort(function (l, r) {
+                        //    return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
+                        //});
                         try {
-                            var i;
-                            if (self.selectedmodel())
-                                i = self.selectedmodel();
-                            //alert(i);
-                            var array;
-                            array = ko.utils.arrayFilter(self.recalls(), function (item) {
-                                return item.Model == self.selectedmodel();
-                            });
-                            //alert(JSON.stringify(array));
+                            //alert(vm.searchresult().length);
+                            //alert(self.selectedmake().Make() + self.selectedmodel() + self.newvehicle());
+                            var veh = new Vehicle();
+                            veh.Make(self.selectedmake().Make());
+                            veh.Model(self.selectedmodel());
+                            veh.Reg(self.newvehicle());
+                            var highest;
+                            //alert(JSON.stringify(vm.searchresult()));
+                            //if (self.searchresult().length > 0)
+                            //    highest = ko.utils.arrayFirst(vm.searchresult(), function (product) {
+                            //        return product.price === Math.max.apply(null, ko.utils.arrayMap(vm.searchresult(), function (e) {
+                            //            return e.price;
+                            //        }));
 
-                            array.sort(function (l, r) {
-                                return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
-                            });
-                            self.searchresult(array);
+                            //    });
 
-                            $('.collapsible').collapsible();
+                            //veh.order(highest);
+                            //alert('added' + JSON.stringify(veh) + veh.Make());
+                            //var array = self.searchresult();
+                            //array.push(veh);
+                            self.searchresult.push(veh);
+
+                            //vm.searchresult(self.searchresult());
+                            //alert('aftee' + JSON.stringify(self.searchresult()));
+                            //ko.utils.addOrRemoveItem(self.searchresult(),veh,true);
+                            //alert('added' + JSON.stringify(self.searchresult()));
+                            writefile("vehicles.txt", ko.toJSON(self.searchresult(), null, 2));
+                            self.selectedmake(null);
+                            self.newvehicle("");
                         } catch (e) { alert(e); }
                         //$('.collapsible').collapsible();
                     }
-                   
+
                 }
                 self.loaddb = function loaddb() {
                     //alert("Firtload");
@@ -278,82 +308,24 @@
                     //alert(self.searchresult());
 
                 }
-                
-                self.setcurrentreg = function (index) {
-
-                    try {
-                        //vm.currentreg(null);
-                            var reg = self.searchresult()[index];
-                            //alert(index);
-                            //var u;// = JSON.stringify(vm.searchresult);
-
-                            vm.idxcurrentreg(index);
-                            //alert('>>>>>>>>>>>>>>>>>' + u);
-                            vm.currentreg(vm.searchresult()[vm.idxcurrentreg()]);
-                            //vm.getcurrentrecalls();
-                            //alert('>>>>>>>>>>>>>>>>>' + ko.mapping.toJSON(vm.searchresult()));
-                            //vm.currentreg(vm.searchresult()[index]);
-
-                            $('.collapsible').collapsible();
-                        } catch (e) { alert('dd' + e); }
-                    
-                }
-                
-
-                self.getcurrentrecalls = function (i) {
-                    try{
-                        //alert(vm.idxcurrentreg());
-                        var reg = vm.searchresult()[i];
-                        var m = JSON.stringify(reg)                    ;
-                        alert(m);
-                        alert(i);
-                        
-                        //array.sort(function (l, r) {
-                        //    return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
-                        //});
-                        //self.searchresult(array);
-                        //var i;
-                        //if (!self.currentreg())
-                        //   self.currentreg();
-                        //alert(ko.mapping.toJSON(vm.recalls()));
-                        //alert(vm.currentreg().Model() + '' + vm.currentreg().Reg());
-                        var array;
-                        array = ko.utils.arrayFilter(vm.recalls(), function (item) {
-                            return item.Model == vm.searchresult()[i].Model();
-                        });
-                        alert('the rec:' +JSON.stringify(array));
-
-                        array.sort(function (l, r) {
-                            return (Date.parse(l.LaunchDate) == Date.parse(r.LaunchDate) ? 0 : (Date.parse(l.LaunchDate) > Date.parse(r.LaunchDate) ? -1 : 1))
-                        });
-                        //ko.mapping.fromJS(array, vm.currentreg().vehiclerecalls);
-                        vm.searchresult()[i].vehiclerecalls(array);
-                        //alert('len' + vm.currentreg().Model.recalls.length);
-                        var l = JSON.stringify(vm.searchresult()[i].Model.recalls);
-                        alert('>>>' + l);
-                       // vm.currentreg().vehiclerecalls(array);
-                        //self.idxcurrentreg(index);
-                        $('.collapsible').collapsible();
-
-                    }catch(e){ alert('eee'+e);}
-                }
             }
             var vm = new viewModel();
-           
+
             function setup() {
 
                 try {
                     //alert(vm.searchresult().length);
                     //if (vm.searchresult().length > 0)
-                     //   vm.searchresult().splice(0,1);
-                   // alert(JSON.stringify(vm.searchresult()));
-                ko.applyBindings(vm);
+                    //   vm.searchresult().splice(0,1);
+                    // alert(JSON.stringify(vm.searchresult()));
+                    ko.applyBindings(vm);
                 } catch (e) { alert(e); }
-                vm.isloading(true);
+                //vm.isloading(true);
                 //alert(JSON.stringify(vm.SearchQuery()));
                 //alert('');
                 //alert(vm.recalls().length);
-                
+
+                // vm.isloading(false);
                 //alert(data.length);
                 //getfile();
                 // alert(JSON.stringify(vm.mans())) ;
@@ -369,17 +341,17 @@
                     elem.on("swipe", swipeHandler);
                     // Callback function references the event target and adds the 'swipe' class to it
                     function swipeHandler(event) {
-                      
+
                         //alert('wwiped1');
                         //$(event.target).addClass("hidden");
                     }
                 },
                 update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-                    try{
+                    try {
                         var elem = $(element);
-               
-                
-                
+
+
+
                         elem.on("swipe", swipeHandler);
                         // Callback function references the event target and adds the 'swipe' class to it
                         function swipeHandler(event) {
@@ -409,11 +381,11 @@
                                 right: '0px',
                                 width: '100%',
                                 height: bottomHeight,
-                                opacity:1
+                                opacity: 1
                             });
                             //alert(val);
                             if (!val) {
-                                
+
                                 vm.swiperow(reg);
 
 
@@ -423,12 +395,12 @@
 
                             } else {
                                 //value.showdel(false);
-                                
+
                             }
-                               
+
                         }
-                    } catch (e) { alert(e);}
-            }
+                    } catch (e) { alert(e); }
+                }
             }
 
             function deletevehicle(event) {
@@ -441,7 +413,7 @@
                 try {
 
                     for (i = 0; i < vm.searchresult().length; i++) {
-                        alert(vm.searchresult()[i].Reg() +'>>'+ m)
+                        //alert(vm.searchresult()[i].Reg() + '>>' + m)
                         if (vm.searchresult()[i].Reg() == m) {
                             vm.searchresult().splice(i, 1);
                         }
@@ -451,8 +423,8 @@
                     writefile("vehicles.txt", ko.toJSON(vm.searchresult(), null, 2));
                     btn.toggle(false);
                 } catch (e) {
-                   // alert(e);
-                    try{
+                    // alert(e);
+                    try {
                         for (i = 0; i < vm.searchresult().length; i++) {
                             if (vm.searchresult()[i].Reg == m) {
                                 vm.searchresult().splice(i, 1);
@@ -462,29 +434,51 @@
                         //self.searchresult.remove(reg);
                         writefile("vehicles.txt", ko.toJSON(vm.searchresult(), null, 2));
                         btn.toggle(false);
-                    } catch (e) { alert(e);}
+                    } catch (e) { alert(e); }
                 }
             }
         </script>
         <style>
-            .right {
+            .box { background-color:black;
+                   width:100px;
+                   height:20px;
+            }
+            #divOverlay { background-color:black; text-align:center;  position:absolute; width:100%; height:100%; z-index:10000; opacity:0.8; color:white; line-height:20px; font-size:larger;  padding-top:30px; } 
+.blind{display: none; background:#000; height: 80px; width: 320px;}
+.second{display:none; background: #00f; height: 80px; width: 320px;}
+            .delbtn {
+                width:100px !important;
                 float:right;
-                display:inline;
-            }            
-           .left {
-                float:left;
-                 display:inline;
+            }
+            .vehiclerow td {
+                width: 30%;
+                text-align:center;
+                height:45px;
             }
             .center {
                 text-align:center;
-            } 
-             .hidden {
+            }
+            .hidden {
                 display:none;
-            }         
-                    .collapsible-set,.collapsible {
-           font-size: smaller;
-       }
+            }
+            body {
+                background-image: url('img/VRCBackground.jpg') !important;
+                background-color:transparent;
+            }
 
+            .ui-page, .ui-body-c, .ui-page-active, .ui-overlay-c, .ui-mobile-viewport
+{
+    background: transparent !important;
+}
+
+body, .ui-overlay-c
+{
+    background: url('img/VRCBackground.jpg') !important;
+    background-repeat:repeat-y !important;
+    background-position:center center !important;
+    background-attachment:scroll !important;
+    background-size:100% 100% !important;
+}
         </style>
     </body>
 </html>
