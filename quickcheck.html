@@ -35,9 +35,16 @@
             </div>
             
             <div data-bind="visible: isloading || mans().length ==0" >Loading..</div>
-               <div data-bind="visible: mans().length > 0">
-            <select data-bind="options: mans(), optionsText: 'Make', visible: mans().length > 0, value: selectedmake, optionsCaption: 'Select Manufacturer', event: { change: combochange }"></select>
-             </div>
+               <div data-bind="visible: filteredmans().length > 0">
+                                 <form>
+    <input data-type="search" data-bind="value: selectedmake() ? selectedmake().Make : '','click': clearman" placeholder="Select Manufacturer" id="filtermans">
+</form>
+                     <ul class="lstmans" data-role="listview" data-bind="foreach: filteredmans(), visible: showmans">
+                         <li data-bind="text: Make, 'click': function(){$parent.selectItem(Make());}"></li>
+                     </ul>
+                     <div style="display:none;">
+            <select id="drpmans"   data-bind="options: filteredmans(), optionsText: 'Make', visible: false, value: selectedmake, optionsCaption: 'Select Manufacturer'"></select>
+            </div> </div>
             <div  data-bind="visible: (selectedmake() && selectedmake().Models().length > 0)"><select data-bind="    options: (selectedmake() && selectedmake().Models()) ? selectedmake().Models() : [], optionsText: 'Model', visible: (selectedmake() && selectedmake().Models().length > 0), value: selectedmodel, optionsCaption: 'Select Model', event: { change: combochange }"></select>
                 </div>
             <div   data-bind="visible: selectedmodel()">
@@ -54,12 +61,14 @@
                     </p>
                        
                 </div>
-                        </div>
+                        </div><br /><br />
+                        <button data-bind="click: clear" value="add">Clear</button>
 
                 <!-- /ko --> 
                 </div>
 
         </div>
+
 
         <script type="text/javascript" src="cordova.js"></script>
                 <script type="text/javascript" src="js/FileTransfer.js"></script>
@@ -192,6 +201,45 @@
 
                     $('.collapsible').collapsible();
                 }
+                self.filteredmans = ko.observableArray([]);
+                self.getman = function (reg) {
+                    return ko.utils.arrayFilter(self.filteredmans(), function (event) {
+                        return (event.Make() === reg);
+                    });
+                };
+                self.searchmans = function searchmans(txt) {
+                    try {
+                        var res = ko.utils.arrayFilter(self.filteredmans(), function (event) {
+                            return (event.Make().toLowerCase().indexOf(txt.toLowerCase()) > -1);
+                        });
+                        self.filteredmans(res);
+                        //self.selectedmake(self.filteredmans[0]);
+                        //alert(res.length);
+                    } catch (e) { alert(e); }
+                };
+                self.selectItem = function setman(make) {
+                    //alert(make);
+                    try {
+                        var n = self.getman(make)[0];
+                        //alert(n.Make());
+                        //alert(JSON.stringify(n));
+                        //alert(JSON.stringify(n));
+                        self.selectedmake(n);
+                        //$("#lstmans").css("display", "none");
+                        self.showmans(false);
+                    } catch (e) { alert(e); }
+                };
+                self.clearman = function clearman() {
+                    self.showmans(true);
+                    //self.selectedmake(null);
+                    //
+                    //$("#lstmans").css("display", "none");
+                };
+                self.clear = function clear() {
+                    self.selectedmodel(null);
+                    self.selectedmake(null);
+                };
+                self.showmans = ko.observable(true);
             }
             var vm = new viewModel();
             function setup() {
@@ -222,7 +270,10 @@
        .collapsible-set,.collapsible {
            font-size: smaller;
        }
-
+          .lstmans {
+                max-height:160px;
+                overflow-y:scroll;
+            }
     </style>  </body>
    
 </html>

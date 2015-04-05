@@ -390,7 +390,9 @@ function readthis(entry, fileName) {
             if (fileName == "mans.txt") {
                 son.sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
                 ko.mapping.fromJS(son, {}, vm.mans);
+                vm.filteredmans(vm.mans());
                 $('.help').addClass("hidden");
+               
             }
             if (fileName == "reminders.txt") {
                 ko.mapping.fromJS(son, vm.reminders);

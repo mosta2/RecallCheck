@@ -77,17 +77,25 @@
         </tr>
     </tbody>
 </table>
-                 <div data-bind="visible: mans().length > 0">
-            <select data-bind="options: mans(), optionsText: 'Make', visible: mans().length > 0, value: selectedmake, optionsCaption: 'Select Manufacturer'"></select>
-             </div>
+                          <form>
+    <input data-type="search" data-bind="value: selectedmake() ? selectedmake().Make : '','click': clearman" placeholder="Select Manufacturer" id="filtermans">
+</form>
+                 <div data-bind="visible: filteredmans().length > 0">
+       
+                     <ul class="lstmans" data-role="listview" data-bind="foreach: filteredmans(), visible: showmans">
+                         <li data-bind="text: Make, 'click': function(){$parent.selectItem(Make());}"></li>
+                     </ul>
+                     <div style="display:none;">
+            <select id="drpmans"   data-bind="options: filteredmans(), optionsText: 'Make', visible: false, value: selectedmake, optionsCaption: 'Select Manufacturer'"></select>
+            </div> </div>
             <div  data-bind="visible: (selectedmake() && selectedmake().Models().length > 0)">
                 <select data-bind="    options: (selectedmake() && selectedmake().Models()) ? selectedmake().Models() : [],  optionsText: 'Model', visible: (selectedmake() && selectedmake().Models().length > 0), value: selectedmodel, optionsCaption: 'Select Model'"></select>
                 </div>
             <div  data-bind="visible: selectedmodel()">
                 <div class="txtveh">
-            <input type="text"  style="background-image:url('img/plate.png'); background-repeat:no-repeat; padding-left:25px; font-size:large; font-weight:bold; color:black; background-color:#fbe712; min-height:40px; " data-bind="value: newvehicle" >
+            <input type="text" placeholder="Enter Name of Vehicle"  style="background-image:url('img/plate.png'); background-repeat:no-repeat; padding-left:25px; font-size:large; font-weight:bold; color:black; background-color:#fbe712; min-height:40px; " data-bind="value: newvehicle" >
                     </div>
-                <button data-bind="click: $root.performsearch()" value="add">Add Vehicle</button>
+                <button data-bind="click: $root.performsearch()" value="add">Store this Vehicle</button>
                 </div>
             <div>
                 
@@ -127,6 +135,17 @@
 
                     }
                 });
+
+
+                    // Bind the swipeHandler callback function to the swipe event on div.box
+                    $("#filtermans").keydown(function filtermans(event) {
+                        var j = $("#filtermans").val();
+                         //alert(j);
+                        vm.searchmans(j);
+                        $("#drpmans").click();
+
+                    });
+                
                 //vm.loaddb();
             });
 
@@ -310,12 +329,43 @@
                     }
 
                 }
-                self.loaddb = function loaddb() {
-                    //alert("Firtload");
+                self.filteredmans = ko.observableArray([]);
+                self.getman = function (reg) {
+                    return ko.utils.arrayFilter(self.filteredmans(), function (event) {
+                        return (event.Make() === reg);
+                    });
+                };
+                self.searchmans = function searchmans(txt) {
+                    try{
+                        var res = ko.utils.arrayFilter(self.filteredmans(), function (event) {
+                            return (event.Make().toLowerCase().indexOf(txt.toLowerCase()) > -1);
+                        });
+                        self.filteredmans(res);
+                        //self.selectedmake(self.filteredmans[0]);
+                        //alert(res.length);
+                    } catch (e) { alert(e);}
+                };
+                self.selectItem = function setman(make) {
+                    //alert(make);
+                    try{
+                        var n = self.getman(make)[0];
+                        //alert(n.Make());
+                        //alert(JSON.stringify(n));
+                        //alert(JSON.stringify(n));
+                        self.selectedmake(n);
+                        //$("#lstmans").css("display", "none");
+                        self.showmans(false);
+                    } catch (e) { alert(e);}
+                };
+                self.clearman = function clearman() {
+                    self.showmans(true);
+                    //self.selectedmake(null);
+                    //
+                   //$("#lstmans").css("display", "none");
+                };
+                self.showmans = ko.observable(true);
 
-                    //alert(self.searchresult());
-
-                }
+                
             }
             var vm = new viewModel();
 
@@ -482,6 +532,10 @@
             }
             .hidden {
                 display:none;
+            }
+            .lstmans {
+                max-height:160px;
+                overflow-y:scroll;
             }
         </style>
     </body>

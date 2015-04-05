@@ -327,6 +327,7 @@ function readthis(entry,fileName) {
             }
             son.sort(function (left, right) { return left.Make == right.Make ? 0 : (left.Make < right.Make ? -1 : 1) });
             ko.mapping.fromJS(son, {}, vm.mans);
+            vm.filteredmans(vm.mans());
             $('.help').addClass("hidden");
             //ko.mapping.fromJS(son, vm.mans);
             vm.isloading(false);
