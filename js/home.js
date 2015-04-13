@@ -118,12 +118,12 @@ function gotfile(entry) {
     var msPerYear = msPerDay * 365;
 
     var days = diff / msPerDay;
+    //var minutes = diff / msPerMinute;
     window.sessionStorage.setItem("checked", "1");
     window.sessionStorage.setItem("lastchecked", filedate);
-
     if (days > 7 && entry.name == "recallsfilemap.txt") {
         //alert('refres');
-        downloadAsset();
+        downloadAsset(entry, "recallsfilemap.txt");
         vm.progress("Cheking New Recalls");
     }
     else {
