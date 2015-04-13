@@ -71,7 +71,7 @@ function check3(fileName) {
 }
 function appStart(entry) {
    
-    var file = entry.file(gotfile, downloadAsset(entry, 'recallsfilemap.txt'));
+    var file = entry.file(gotfile, downloadAsset);
 
     //store = cordova.file.dataDirectory;
     ////cordova.file.dataDirectory.getFile(store + "test.txt", { create: false }, gotfile, downloadAsset); //of requestFileSystem
@@ -123,8 +123,8 @@ function gotfile(entry) {
 
     if (days > 7 && entry.name == "recallsfilemap.txt") {
         //alert('refres');
-        downloadAsset(entry, 'recallsfilemap.txt');
-        vm.progress("Checking new recalls");
+        downloadAsset();
+        vm.progress("Cheking New Recalls");
     }
     else {
 
@@ -191,7 +191,7 @@ else {
 //alert(vm.filesread());
  if (!bet.data & countfail < 2) {
                     countfail += 1;
-                    downloadAsset(entry, 'recallsfilemap.txt');
+                    downloadAsset();
                 }
                 if (countfail >= 2)
                     alert("Error Occured!");
@@ -355,7 +355,7 @@ function readfile(fileName) {
 }
 function openfile(entry, fileName) {
     //alert('ead' + ".txt" + JSON.stringify(entry.File()));
-    var file = entry.file(function (reader) { return readthis(reader, fileName); }, downloadAsset(entry, 'recallsfilemap.txt'));
+    var file = entry.file(function (reader) { return readthis(reader, fileName); }, downloadAsset);
 }
 function filenotfound() {
     //alert("file not found!");
